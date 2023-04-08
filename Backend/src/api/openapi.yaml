@@ -1,66 +1,162 @@
-openapi: 3.1.0
+---
+openapi: 3.0.2
 info:
-  title: MyAPP
-  description: "__ TODO: Diese Datei durch eine eigene API-Spezifikation ersetzen. __"
-  contact:
-    name: Dennis Schulmeister-Zimolong
-    url: https://www.wpvs.de
-    email: dhbw@windows3.de
+  title: Yogastudio
+  version: 1.0.0
+  description: "Diese Yogastudio-App benutzt einen simplen REST-Webservice zur Kommunikation\
+    \ mit dem Backend. Dieser ermöglicht das An- und abmelden für einen Yoga Kurs,\
+    \ sowie das Schreiben einer Bewertung. Jeder Teilnehmer enthält Informationen\
+    \ zu seinem Vornamen, Nachnamen, Telefonnummer, Mitgliedernummer und dem Kurs"
+  contact: {}
   license:
-    name: CC-BY-4.0
-    url: https://creativecommons.org/licenses/by/4.0/deed.de
-  version: "1.0"
-servers:
-- url: http://localhost:3000
-tags:
-- name: Beispiel
+    name: The Unlicense
+    url: http://unlicense.org
 paths:
-  /:
+  /teilnehmer:
+    summary: Path used to manage the list of teilnehmers.
+    description: "The REST endpoint/path used to list and create zero or more `Teilnehmer`\
+      \ entities.  This path contains a `GET` and `POST` operation to perform the\
+      \ list and create tasks, respectively."
     get:
-      tags:
-      - Index
-      summary: Wurzeladresse des Webservices
-      description: Liefert eine HATEOAS-Übersicht aller collections
-      operationId: index
       responses:
         "200":
-          description: OK
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/HATEOAS_Collection'
-                x-content-type: application/json
-
+                  $ref: '#/components/schemas/Teilnehmer'
+          description: Successful response - returns an array of `Teilnehmer` entities.
+      operationId: getTeilnehmers
+      summary: List All Teilnehmers
+      description: Gets a list of all `Teilnehmer` entities.
+    post:
+      requestBody:
+        description: A new `Teilnehmer` to be created.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Teilnehmer'
+        required: true
+      responses:
+        "201":
+          description: Successful response.
+      operationId: createTeilnehmer
+      summary: Create a Teilnehmer
+      description: Creates a new instance of a `Teilnehmer`.
+    parameters:
+    - name: first_name
+      description: Vorname
+      schema:
+        type: string
+      in: query
+    - name: last_name
+      description: Nachname
+      schema:
+        type: string
+      in: query
+    - name: phone
+      description: Telefonnumer
+      schema:
+        type: string
+      in: query
+    - name: memberID
+      description: Mitgliedsnummer
+      schema:
+        type: string
+      in: query
+    - name: kurs
+      description: Kurs
+      schema:
+        type: string
+      in: query
+  /teilnehmer/{teilnehmerId}:
+    summary: Path used to manage a single Teilnehmer.
+    description: "The REST endpoint/path used to get, update, and delete single instances\
+      \ of an `Teilnehmer`.  This path contains `GET`, `PUT`, and `DELETE` operations\
+      \ used to perform the get, update, and delete tasks, respectively."
+    get:
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Teilnehmer'
+          description: Successful response - returns a single `Teilnehmer`.
+      operationId: getTeilnehmer
+      summary: Get a Teilnehmer
+      description: Gets the details of a single instance of a `Teilnehmer`.
+    put:
+      requestBody:
+        description: Updated `Teilnehmer` information.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Teilnehmer'
+        required: true
+      responses:
+        "202":
+          description: Successful response.
+      operationId: updateTeilnehmer
+      summary: Update a Teilnehmer
+      description: Updates an existing `Teilnehmer`.
+    delete:
+      responses:
+        "204":
+          description: Successful response.
+      operationId: deleteTeilnehmer
+      summary: Delete a Teilnehmer
+      description: Deletes an existing `Teilnehmer`.
+    patch:
+      requestBody:
+        description: Zu ändern
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Teilnehmer'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Teilnehmer'
+          description: OK
+    parameters:
+    - name: teilnehmerId
+      description: A unique identifier for a `Teilnehmer`.
+      schema:
+        type: string
+      in: path
+      required: true
 components:
   schemas:
-    HATEOAS_Collection:
-      title: HATEOAS-Links einer Collection
+    Teilnehmer:
+      title: Root Type for Teilnehmer
+      description: Anmelden für den Kurs
       type: object
       properties:
-        _name:
+        first_name:
           type: string
-        query:
+        last_name:
+          type: string
+        phone:
+          type: string
+        memberID:
+          type: string
+        kurs:
+          type: string
+        _links:
           $ref: '#/components/schemas/HATEOAS_Link'
-        create:
-          $ref: '#/components/schemas/HATEOAS_Link'
-
-    HATEOAS_Resource:
-      title: HATEOAS-Links einer Resource
-      type: object
-      properties:
-        read:
-          $ref: '#/components/schemas/HATEOAS_Link'
-        update:
-          $ref: '#/components/schemas/HATEOAS_Link'
-        patch:
-          $ref: '#/components/schemas/HATEOAS_Link'
-        delete:
-          $ref: '#/components/schemas/HATEOAS_Link'
-
+          description: ""
+      example:
+        first_name: Teresa
+        last_name: Müller
+        phone: +49 123 456789
+        memberID: "0"
+        kurs: Anfänger
     HATEOAS_Link:
-      title: HATEOAS-Link
+      title: Root Type for HATEOAS_Link
+      description: HATEOAS_Link
       type: object
       properties:
         url:
@@ -71,5 +167,50 @@ components:
           type: array
           items:
             type: string
-
-  securitySchemes: {}
+      example:
+        url: /teilnehmer
+        method: GET
+        query_params:
+        - first_name
+        - last_name
+    HATEOAS_Ressource:
+      title: Root Type for HATEOAS_Ressource
+      description: HATEOAS_Link einer Ressource
+      type: object
+      properties:
+        read:
+          $ref: '#/components/schemas/HATEOAS_Link'
+        update:
+          $ref: '#/components/schemas/HATEOAS_Collection'
+        patch:
+          $ref: '#/components/schemas/HATEOAS_Link'
+        delete:
+          $ref: '#/components/schemas/HATEOAS_Link'
+      example:
+        read: ""
+        update: ""
+        patch: ""
+        delete: ""
+    HATEOAS_Collection:
+      title: Root Type for HATEOAS_Collection
+      description: HATEOAS_Link einer Collection
+      required: []
+      type: object
+      properties:
+        _name:
+          type: string
+        query:
+          $ref: '#/components/schemas/HATEOAS_Link'
+        create:
+          $ref: '#/components/schemas/HATEOAS_Link'
+      example:
+        _name: Teilnehmer
+        query: ""
+        create: ""
+tags:
+- name: Teilnehmer
+  description: Teilnehmerliste
+- name: Bewertung
+  description: "Bewertung für einen Kurs schreiben, löschen und bearbeiten"
+- name: Kurs
+  description: Kursliste
